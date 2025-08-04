@@ -27,8 +27,8 @@ def bfs(sx,sy,d):
     while dq:
         cx,cy,d = dq.popleft()
 
-        for i in range(4):
-            nd = (d+3-i) % 4  # 90도 회전     
+        for i in range(1,5):
+            nd = (d-i) % 4  # 90도 회전     
             nx,ny = cx+dir[nd][0], cy+dir[nd][1] # 주변 4칸 확인
         
             if isvalid(nx,ny) and not graph[nx][ny]: # 3. 청소되지 않은 빈칸이 있는 경우
