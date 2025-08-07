@@ -3,73 +3,51 @@ from collections import deque
 
 def solution(land):
     
-    n = len(land)
-    m = len(land[0])
+    n, m = len(land), len(land[0]) # 500*500이 최대 크기
     visited = [[0] * m for _ in range(n)]
-    sizes = []
-    loc = []
-    
+
     def isvalid(x,y):
-        return 0 <= x < n and 0 <= y < m 
+        return 0 <= x < n and 0 <= y < m
     
-    def bfs(i,j,t):
-        dq = deque()
-        dq.append((i,j))
-        visited[i][j] = 1
+    # 일단 bfs()로 1이 엮여있는 영역 크기를 세자. 
+    # 영역도 번호를 붙여서 directory로 번호: 영역크기로 저장할까? 그래서 set으로 중복없애서 영역 셀 수 있게 
+    # 그럼 일단 solution에 for for 돌려서 1이 나오면 그때 visit체크, 영역 세기를 해야하나
+    # 원본 land는 남겨놓고 copy써야할듯 
+
+    result = [0]  * m
+    
+    # 이건 최단경로가 아니라 영역 크기를 세는거
+    def bfs(sx,sy):
+        
+        dq = deque([(sx,sy)])
+        cnt = 1
+        visited[sx][sy] = 1
         dir = [(0,1), (0,-1), (1,0), (-1,0)]
+        tmp = set()
+        tmp.add(sy)
         
-        size = 1
-        loc.append((i,j,t))
-        
+        # 같은 영역에서는 ny가 다르면됨
         while dq:
             cx,cy = dq.popleft()
             
-            for dx, dy in dir:
-                nx,ny = cx+dx, cy+dy 
+            for dx,dy in dir:
+                nx,ny = cx+dx, cy+dy
                 
-                if isvalid(nx,ny) and land[nx][ny]:
-                    if not visited[nx][ny]:
+                if isvalid(nx,ny) and not visited[nx][ny]:
+                    if land[nx][ny]:
+                        cnt += 1
+                        tmp.add(ny)
                         dq.append((nx,ny))
                         visited[nx][ny] = 1
-                        size += 1
-                        loc.append((nx,ny,t))
-        return size
     
-    t = 1
+        return cnt,tmp
+    
+    tmp_set = set()
     for i in range(n):
         for j in range(m):
             if land[i][j] and not visited[i][j]:
-                r = bfs(i,j,t)
-                sizes.append((t,r))
-                t += 1
-
-    for i,j,t in loc:
-        visited[i][j] = sizes[t-1][1] 
-        
-    # 이제 해야할일 : 같은 영역은 set취급하여 열별로 계산 
-    
-    loc.sort(key=lambda x: x[1])
-    
-    result = []
-    result.append((loc[0][0],loc[0][1],visited[loc[0][0]][loc[0][1]]))
-
-    for i in range(1, len(loc)):
-        if loc[i][1] == loc[i-1][1] and loc[i][2] == loc[i-1][2]:
-            # 같은 열이고, 같은 그룹이라면
-            pass
-        else:
-            result.append((loc[i][0],loc[i][1],visited[loc[i][0]][loc[i][1]]))
-            
-    answer = 0
-    cur = result[0][2]
-    
-    for i in range(1,len(result)):
-        if result[i-1][1] == result[i][1]:
-            cur += result[i][2]
-            
-        else: # 다르면 열이 바뀐거니까 갱신 
-            answer = max(cur, answer)
-            cur = result[i][2]
-    
-    answer = max(cur,answer)
-    return answer
+                cnt, tmp_set = bfs(i,j)
+                for k in tmp_set:
+                    result[k] += cnt
+                    
+    return max(result)
