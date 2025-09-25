@@ -1,6 +1,4 @@
-
 -- 빈 시간은 0으로 채워야함 
--- 몇시에 가장 활발? 
 
 WITH RECURSIVE tmp AS (
     SELECT 0 AS num
@@ -19,4 +17,3 @@ SELECT tmp.num as HOUR, COALESCE(a.COUNT,0) as COUNT from tmp LEFT JOIN
 ON tmp.num = A.HOUR
 GROUP BY tmp.num
 ORDER BY tmp.num ASC;
-
