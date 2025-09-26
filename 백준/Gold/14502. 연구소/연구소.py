@@ -1,61 +1,54 @@
-import sys
-from collections import deque
-input = sys.stdin.readline
+import sys, copy
+input = sys.stdin.readline 
+from collections import deque 
+n,m = map(int,input().split())
+graph = []
+for i in range(n):
+    graph.append(list(map(int,input().split())))
 
-# 백트래킹을 활용한 벽 설치
-def backtrack(cnt, idx):
-    if cnt == 3:  # 벽을 3개 설치하면 BFS 실행
-        tmp_graph = [row[:] for row in graph]  # 원본 그래프 복사
-        bfs(tmp_graph)
-        return
+result = 0 
+
+dir = [(0,1), (0,-1), (1,0), (-1,0)]
+
+def isvalid(x,y):
+    return 0 <= x < n and 0 <= y < m
     
-    for i in range(idx, len(walls)):
-        x, y = walls[i]
-        graph[x][y] = 1  # 벽 설치
-        backtrack(cnt + 1, i + 1)
-        graph[x][y] = 0  # 백트래킹 (원상 복구)
-
-# BFS를 이용한 바이러스 확산
-def bfs(tmp_graph):
-    global result
+def bfs():
     dq = deque()
+    tmp_graph = [row[:] for row in graph]
 
     for i in range(n):
         for j in range(m):
-            if graph[i][j] == 2:
-                dq.append((i, j))  # 초기 바이러스 위치 추가
+            if tmp_graph[i][j] == 2:
+                dq.append((i,j))
 
     while dq:
-        y, x = dq.popleft()
-        for dx, dy in directions:
-            nx, ny = x + dx, y + dy
-            if 0 <= ny < n and 0 <= nx < m and tmp_graph[ny][nx] == 0:
-                tmp_graph[ny][nx] = 2
-                dq.append((ny, nx))
+        cx,cy = dq.popleft()
+        for dx,dy in dir:
+            nx,ny = cx+dx, cy+dy 
 
-    result = max(result, count_safe_area(tmp_graph))  # 최대 안전 영역 갱신
+            if isvalid(nx,ny):
+                if not tmp_graph[nx][ny]:
+                    tmp_graph[nx][ny] = 2
+                    dq.append((nx,ny))
 
-# 안전 영역(0 개수) 계산
-def count_safe_area(tmp_graph):
-    return sum(row.count(0) for row in tmp_graph)
+    global result 
+    cnt = 0
+    for i in range(n):
+        cnt += tmp_graph[i].count(0)
+    result = max(result,cnt)
 
-# 입력 처리
-n, m = map(int, input().split())
-graph = [list(map(int, input().split())) for _ in range(n)]
-walls = []  # 벽을 세울 수 있는 후보 좌표
-result = 0  # 최대 안전 영역 크기
+def makeWall(cnt):
+    if cnt == 3:
+        bfs()
+        return 
+        
+    for i in range(n):
+        for j in range(m):
+            if not graph[i][j]:
+                graph[i][j] = 1
+                makeWall(cnt+1)
+                graph[i][j] = 0 # backtracking 
 
-# 벽을 세울 수 있는 위치 저장
-for i in range(n):
-    for j in range(m):
-        if graph[i][j] == 0:
-            walls.append((i, j))
-
-# 상하좌우 이동 방향 정의
-directions = [(-1, 0), (0, -1), (1, 0), (0, 1)]
-
-# 백트래킹 시작
-backtrack(0, 0)
-
-# 결과 출력
+makeWall(0)
 print(result)
