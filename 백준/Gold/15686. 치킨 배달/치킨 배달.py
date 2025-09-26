@@ -1,53 +1,37 @@
-import sys, copy
-input = sys.stdin.readline 
+import sys 
+from itertools import combinations
 from collections import deque
-sys.setrecursionlimit(10**5)
+input = sys.stdin.readline 
 
 n,m = map(int,input().split())
 graph = []
+
+def chi_dist(x1,y1,x2,y2):
+    return abs(x1-x2) + abs(y1-y2)
+
 for _ in range(n):
-    row = list(map(int,input().split()))
-    graph.append(row)
+    graph.append(list(map(int,input().split())))
 
-# m개의 치킨집 최대 
+homes, chickens = [], []
 
-home = [(i,j) for i in range(n) for j in range(n) if graph[i][j] == 1]
-loc = [(i,j) for i in range(n) for j in range(n) if graph[i][j] ==2]
+# 집과 치킨의 좌표 저장
+for i in range(n):
+    for j in range(n):
+        if graph[i][j] == 1:
+            homes.append((i,j))
+        elif graph[i][j] == 2:
+            chickens.append((i,j))
 
-visited_loc = [0] * len(loc)
-res = []
+# 치킨을 M만 고르는 조합 만들기
+chics = list(combinations(chickens,m))
+                    
+min_result = float('inf')
+for ch in chics:
+    tmp = 0
+    for hx,hy in homes:
+        tmp += min(chi_dist(hx,hy,sx,sy) for sx, sy in ch)
+    min_result = min(tmp,min_result)
+print(min_result)
+    
 
-
-res = float('inf')
-g = copy.deepcopy(graph)
-for x,y in loc:
-    g[x][y] = 0
-
-def backtracking(idx,cnt):
-
-    global res 
-
-    if cnt == m:
-        total = 0
-        for hx,hy in home:
-            min_dist = float('inf')
-            for k, (cx,cy) in enumerate(loc):
-                if visited_loc[k]:
-                    dist = abs(hx-cx) + abs(hy-cy)
-                    min_dist = min(min_dist, dist)
-            total += min_dist
-        res = min(res,total)
-        return 
-
-    for i in range(idx,len(loc)):
-        x,y = loc[i]
-        g[x][y] = 2
-        visited_loc[i] = 1
-        backtracking(i+1,cnt+1) 
-        g[x][y] = 0
-        visited_loc[i] = 0
-
-
-backtracking(0,0)
-print(res)
 
