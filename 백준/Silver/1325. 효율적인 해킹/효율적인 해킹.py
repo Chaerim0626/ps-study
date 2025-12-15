@@ -1,36 +1,40 @@
-N, M = map(int, input().split())
-info = [[] for _ in range(N)]
-max_cnt = -1
-answer = []
+import sys
+sys.setrecursionlimit(10**5)
+input = sys.stdin.readline
 
-for _ in range(M):
-    com2, com1 = map(lambda x: int(x)-1, input().split())
-    info[com1].append(com2)
+n, m = map(int, input().split())
 
-for com1 in range(N):
-    is_visited = [False] * N
-    if len(info[com1]) > 0:
-        cnt = 1
-        is_visited[com1] = True
-        stack = [com1]
+# 역방향 그래프
+graph = [[] for _ in range(n + 1)]
 
-        while len(stack) > 0:
-            cur = stack.pop()
+for _ in range(m):
+    a, b = map(int, input().split())
+    graph[b].append(a)
 
-            for new_com2 in info[cur]:
-                if is_visited[new_com2] is False:
-                    cnt += 1
-                    stack.append(new_com2)
-                    is_visited[new_com2] = True
+def dfs(start):
+    stack = [start]
+    visited = [0] * (n + 1)
+    visited[start] = 1
+    cnt = 1
 
-        if max_cnt < cnt:
-            max_cnt = cnt
-            answer = [com1]
-        elif max_cnt == cnt:
-            answer.append(com1)
+    while stack:
+        cur = stack.pop()
+        for nxt in graph[cur]:
+            if not visited[nxt]:
+                visited[nxt] = 1
+                cnt += 1
+                stack.append(nxt)
+    return cnt
 
-answer.sort()
-answer = list(map(lambda x: x+1, answer))
+max_cnt = 0
+result = []
 
-for ele in answer:
-    print(ele, end=" ")
+for i in range(1, n + 1):
+    c = dfs(i)
+    if c > max_cnt:
+        max_cnt = c
+        result = [i]
+    elif c == max_cnt:
+        result.append(i)
+
+print(*result)
