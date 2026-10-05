@@ -1,6 +1,9 @@
--- 코드를 입력하세요
-SELECT MEMBER_ID, MEMBER_NAME, GENDER,
-DATE_FORMAT(DATE_OF_BIRTH, '%Y-%m-%d') as DATE_OF_BIRTH
-from MEMBER_PROFILE
-where gender = 'W' and DATE_OF_BIRTH = DATE_FORMAT(DATE_OF_BIRTH, '%Y-03-%d') and TLNO is not null 
-order by member_id asc;
+-- 20:26 
+-- 3월생 여성 ID/이름/성별/생년월일 조회
+-- 전화번호 NULL 제외 / 회원 ID 기준 오름
+
+SELECT MEMBER_ID, MEMBER_NAME, GENDER, DATE_FORMAT(DATE_OF_BIRTH, '%Y-%m-%d') as DATE_OF_BIRTH
+FROM MEMBER_PROFILE
+WHERE TLNO IS NOT NULL and MONTH(DATE_OF_BIRTH) = '3' and 
+GENDER = 'W'
+ORDER BY MEMBER_ID;
