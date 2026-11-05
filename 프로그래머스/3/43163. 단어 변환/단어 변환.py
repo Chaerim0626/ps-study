@@ -1,32 +1,26 @@
 def solution(begin, target, words):
+    def diff_one(a,b):
+        cnt = 0
+        for x,y in zip(a,b):
+            if x != y:
+                cnt += 1
+        return cnt == 1
     
-    # 최소 몇단계 거쳐서 변환하는지 구해야함 
-    # 한번에 한개 알파벳 바꾸기 
+    result = int(1e9)
+    visited = [False] * len(words)
     
-    if target not in words:
-        return 0
-    
-    # 느낌상 백트래킹일 것 같은데 cnt세서 푸는 
-    n,m = len(begin), len(words)
-    visited = [0] * m
-    result = float('inf')
-    
-    def is_conv(a,b):
-        return sum(x != y for x,y in zip(a,b)) == 1 
-    
-    def backtrack(word, cnt):
+    def backtracking(cur,target,cnt):
         nonlocal result 
+        if cur == target:
+            result = min(result,cnt)
         
-        if word == target:
-            result = min(result, cnt)
-            return 
-        
-        for i, w in enumerate(words):
-            if not visited[i] and is_conv(word,w):
+        for i in range(len(words)):
+            if not visited[i] and diff_one(cur,words[i]):
                 visited[i] = True 
-                backtrack(w,cnt+1)
-                visited[i] = False 
-    
-    backtrack(begin,0)
+                backtracking(words[i],target,cnt+1)
+                visited[i] = False
+                
 
-    return result
+    backtracking(begin,target,0)
+    
+    return result if result < int(1e9) else 0
