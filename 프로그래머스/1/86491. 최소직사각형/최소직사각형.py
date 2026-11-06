@@ -1,19 +1,14 @@
 def solution(sizes):
-    answer = 0
-    
-    new_sizes = []
-    sizes.sort(key=lambda x:(x[0],x[1]))
-
-    for i,j in sizes:
-        if i >= j:
-            new_sizes.append([i,j])
+    result = []
+    for a,b in sizes:
+        if a>=b:
+            result.append([a,b])
         else:
-            new_sizes.append([j,i])
-    
-    new_sizes.sort(reverse=True)
+            result.append([b,a])
+    min_a, min_b = 0, 0
+    print(result)
+    for a,b in result:
+        min_a = max(a,min_a)
+        min_b = max(b,min_b)
 
-    max_i,max_j = 0,0
-    for i, j in new_sizes:
-        max_i,max_j = max(max_i,i), max(max_j,j)
-        
-    return max_i*max_j
+    return min_a*min_b
