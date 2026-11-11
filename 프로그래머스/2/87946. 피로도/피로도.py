@@ -1,19 +1,17 @@
 def solution(k, dungeons):
-    answer = 0
+
+    n = len(dungeons)
     visited = set()
-    
-    def backtracking(piro,cnt):
-        nonlocal answer
+    max_result = 0
+    def backtracking(cnt,piro):
+        nonlocal max_result 
+        max_result = max(max_result,cnt)
         
-        answer = max(answer,cnt)
-        
-        for i,(current, p) in enumerate(dungeons):
-            if i not in visited:
+        for i in range(n):
+            if i not in visited and piro >= dungeons[i][0]:
                 visited.add(i)
-                if piro >= current: 
-                    backtracking(piro-p,cnt+1)
+                backtracking(cnt+1,piro-dungeons[i][1])
                 visited.remove(i)
                 
-    backtracking(k,0)
-        
-    return answer
+    backtracking(0,k)
+    return max_result
