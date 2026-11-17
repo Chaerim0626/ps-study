@@ -1,39 +1,34 @@
 def solution(bandage, health, attacks):
-    # bandage - [시전 시간, 회복량, 추가회복량], attacks - [공격시간, 피해량]
+    answer = 0
+    # 1초마다 x만큼의 체력 회복 t*x + y 
+    # 기술이 취소 당하거나, 기술이 끝나면 즉시 붕대감기
+    # 연속 성공시간 0으로 초기화 
+    max_health, hp = health, health
+    # bandage: t, x, y
+    t,x,y = bandage 
+    # t2, at = attacks
+    streak = 0
+    max_health = health 
+    dic = dict()
     
-    time = [0] * (attacks[-1][0] + 1)
-    time[0] = health
-    at = [i for i,j in attacks]
+    for i, j in attacks:
+        dic[i] = j 
 
-    cont = 0
-    cnt = 0
-    flag = True 
-
-    for i in range(1,len(time)):
+    for i in range(attacks[-1][0]+1):
         
-        if i not in at:
-            time[i] = time[i-1]
-            cont += 1
-            if cont == bandage[0]:
-                time[i] = time[i-1] + bandage[1] + bandage[2]
-                cont = 0
-            
-            else:
-                time[i] = time[i-1] + bandage[1]
-            
-        else:
-            cont = 0 
-            time[i] = time[i-1] - attacks[cnt][1] 
-            cnt += 1
-            if time[i] <= 0 :
-                flag = False 
-                break 
-                
-        if not flag:
-            break
+        if i not in dic: # 공격 초가 아닐때
+            hp += x
+            streak += 1
+            if streak == t: 
+                hp += y 
+                streak = 0
+        else: 
+            streak = 0
+            hp -= dic[i]
         
-        if time[i] > health:
-            time[i] = health
-
-    answer = time[-1] if flag else -1
-    return answer
+        if hp > max_health:
+            hp = max_health
+        elif hp <= 0:
+            return -1
+    
+    return hp
