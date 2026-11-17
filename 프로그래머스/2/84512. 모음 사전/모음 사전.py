@@ -1,15 +1,18 @@
-from itertools import product
-
 def solution(word):
-    answer = 0
+    s = []
+    w = []
+    alpha = 'AEIOU'
     
-    vowels = ['A', 'E', 'I', 'O', 'U']
-    words = []
-
-    for length in range(1, 6):
-        for p in product(vowels, repeat=length):
-            words.append(''.join(p))
-
-    words.sort()
-
-    return words.index(word) + 1
+    def backtracking(start):
+        if len(w) == 5:
+            return 
+        
+        for i in range(5):
+            w.append(alpha[i])
+            if ''.join(w) not in s:
+                s.append(''.join(w))
+            backtracking(start+1)
+            w.pop()
+            
+    backtracking(0)
+    return s.index(word) + 1
